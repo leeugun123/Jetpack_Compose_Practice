@@ -62,33 +62,35 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
-            val navController = rememberNavController()
-            
-            NavHost(navController = navController, 
-                startDestination = "first",){
-                
-                composable("first"){
-                    FirstScreen(navController)
-                }
-
-                composable("second"){
-                    SecondScreen(navController)
-                }
-
-                composable("third/{value}"){ backStackEntry ->
-                    ThirdScreen(navController = navController,
-                        value = backStackEntry.arguments?.getString("value") ?: "",
-                        )
-                }
-                
-                
-            }
-            
-
+            Navigation()
         }
 
 
+    }
+
+}
+
+@Composable
+fun Navigation(){
+
+    val navController = rememberNavController()
+
+    NavHost(navController = navController,
+        startDestination = "first",){
+
+        composable("first"){
+            FirstScreen(navController)
+        }
+
+        composable("second"){
+            SecondScreen(navController)
+        }
+
+        composable("third/{value}"){ backStackEntry ->
+            ThirdScreen(navController = navController,
+                value = backStackEntry.arguments?.getString("value") ?: "",
+            )
+        }
 
     }
 
@@ -158,9 +160,11 @@ fun ThirdScreen(navController: NavController, value : String){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
         Text(text = "세 번째 화면")
         Spacer(modifier = Modifier.height(16.dp))
         Text(value)
+        Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
             navController.navigateUp()
         }){
