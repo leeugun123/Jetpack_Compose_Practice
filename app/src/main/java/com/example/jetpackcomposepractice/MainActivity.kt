@@ -39,6 +39,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +56,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -65,42 +70,64 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
-            val viewModel = viewModel<MainViewModel>()
-
-
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ){
-
-                Text(
-                    viewModel.data.value,
-                    fontSize = 30.sp,
-                )
-                Button(onClick = {
-                    viewModel.changeValue()
-                }){
-                    Text("변경")
-                }
-
-            }
+            HomeScreen()
         }
+
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(viewModel : MainViewModel = viewModel()){
+
+    val text1 : MutableState<String> = remember{
+        mutableStateOf("Hello World")
+    }
+
+    var text2 : String by remember{
+        mutableStateOf("Hello World")
+    }
+
+    val text3 : State<String> = viewModel.liveData.observeAsState("Hello World")
+
+
+    Column() {
+
+        Text("Hello World")
+
+        Button(onClick = {
+            text1.value = "변경"
+            print(text1.value)
+            text2 = "변경"
+            print(text2)
+            viewModel.changeValue("변경")
+        }){
+            Text("클릭")
+        }
+
+
+
+    }
+
+}
+
+class MainViewModel : ViewModel(){
+
+    private val _value : MutableState<String> = mutableStateOf("Hello World")
+    //읽기 , 쓰기 가능
+    val value : State<String> = _value
+    //읽기만 가능
+
+    private val _liveData = MutableLiveData<String>()
+    val liveData : LiveData<String> = _liveData
+
+    fun changeValue(value : String){
+        _value.value = value
     }
 }
 
-class MainViewModel : ViewModel() {
 
-    private val _data = mutableStateOf("Hello")
-    val data : State<String> = _data
-
-    fun changeValue() {
-        _data.value = "World"
-    }
-    //이 메소드를 통해서만 값 변경
-
-}
 
 
 
